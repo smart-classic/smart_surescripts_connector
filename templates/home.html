@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}SMArt SureScripts Connector{% endblock %}
+{% block content %}
+
+<h2 align="center">SMArt SureScripts Connector</h2>
+
+<p>  Setting up the connector is a two-step process: </p>
+
+<ol>
+<li>Connect SMArt{% if indivo_access_token %} &#x2713;<font size=-2>({{indivo_access_token}})</font>{%else%}:
+
+ <a href="{%url connector.views.indivo_start_auth%}">Go!</a>
+{%endif%}
+</li>
+<li>Connect to SureScripts{% if indivo_access_token and not hospital_access_token%}:
+ <a href="{%url connector.views.hospital_start_auth%}">Go!</a>
+{%else%}{% if indivo_access_token and hospital_access_token%}
+&#x2713;  <font size=-2>({{hospital_access_token}})</font>
+{%endif%}
+{%endif%}
+
+</li>
+</ol>
+
+{% if indivo_access_token and hospital_access_token%}
+<p>You're all connected -- your SureScripts <b>data will flow automatically</b> into SMArt.  </p>
+
+<p>If you change your mind, you may
+<a href="{%url connector.views.reset%}">Stop the Connector</a>.</p>
+{%endif%}
+
+
+{% endblock %}
