@@ -2,7 +2,7 @@
 
 ## PARAMETERS TO REVIEW
 
-APP_HOME = "/web/smart_surescripts_connector"
+APP_HOME = "/home/jmandel/Desktop/smart/smart_surescripts_connector"
 
 # Indivo
 INDIVO_SERVER_LOCATION = {'scheme': 'http', 'host': 'localhost', 'port': '7000'}
@@ -84,7 +84,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'indivo_hospital_connector.connector.middlewares.error.Error'
+    'smart_surescripts_connector.connector.middlewares.error.Error'
 )
 
 ROOT_URLCONF = 'urls'
