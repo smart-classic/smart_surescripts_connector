@@ -79,7 +79,7 @@ def hospital_start_auth(request):
     client = H9Client()
     print "Client SP", client.server_params
     # prepare request token parameters
-    params = {'oauth_callback':'http://localhost:8002/google/after_auth'}
+    params = {'oauth_callback':reverse(hospital_after_auth)}
 
     # request a request token
     request_token = client.get_request_token()

@@ -7,7 +7,7 @@
 <p>  Setting up the connector is a two-step process: </p>
 
 <ol>
-<li>Connect SMArt{% if indivo_access_token %} &#x2713;<font size=-2>({{indivo_access_token}})</font>{%else%}:
+<li>Connect to SMArt{% if indivo_access_token %} &#x2713;<font size=-2>({{indivo_access_token}})</font>{%else%}:
 
  <a href="{%url connector.views.indivo_start_auth%}">Go!</a>
 {%endif%}
