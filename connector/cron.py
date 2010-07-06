@@ -31,3 +31,6 @@ def sync():
         print "meds are ", meds
         post = sc.post_med_ccr(meds)
         print "post is ", post
+
+if __name__ == "__main__":
+    sync()
