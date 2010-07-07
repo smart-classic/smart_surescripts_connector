@@ -41,12 +41,13 @@ def indivo_start_auth(request):
     print "Stored request token ", request_token
     # redirect to the UI server
     return HttpResponseRedirect(settings.INDIVO_UI_SERVER_BASE + '/oauth/authorize?oauth_token=%s' % request_token['oauth_token'])
-
+    return ""
             
 def indivo_after_auth(request):
     """
     after Indivo authorization, exchange the request token for an access token and store it in the web session.
     """
+
     # get the token and verifier from the URL parameters
     oauth_token, oauth_verifier = request.GET['oauth_token'], request.GET['oauth_verifier']
 
@@ -122,10 +123,14 @@ def hospital_after_auth(request):
 
 def home(request):
     id = request.session.get('smart_record_id', None) # fetch ID
+    
+    indivo_access_token = None
+    hospital_access_token = None
 
-    tokens = get_tokens_for_record(id)
-    indivo_access_token = 'smart_token' in tokens.keys() and tokens['smart_token']
-    hospital_access_token = 'google_token' in tokens.keys() and tokens['google_token']
+    if (id):
+        tokens = get_tokens_for_record(id)
+        indivo_access_token = 'smart_token' in tokens.keys() and tokens['smart_token']
+        hospital_access_token = 'google_token' in tokens.keys() and tokens['google_token']
           
     if indivo_access_token or hospital_access_token:
         conditions = {}

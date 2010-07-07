@@ -22,6 +22,7 @@ def get_predicate(graph, p):
     return [str(x[2]) for x in graph.triples((None, URIRef(p), None))][0]
 
 def get_tokens_for_record(record_id):
+    print "Getting tokens for ", record_id
     q = """CONSTRUCT {?s ?p ?o} WHERE {?s ?p ?o
                                 filter (?s = <http://smartplatforms.org/record/%s>)
                      }"""%record_id
@@ -79,12 +80,12 @@ def delete_token(id, service):
             ?p = <http://surescripts-loader.apps.smartplatforms.org/%s_secret>)
         }""" % (id,id,service,service)
     
+    print "*******************Woudl delete", q
     SmartClient().delete_rdf_store(q)
     
 def save_token(id, service, access_token, label=None):
     # Don't want multiple keys pointing to multiple tokens -- get rid of the existing ones first!
     delete_token(id, service)
-
     graph = ConjunctiveGraph()    
     ss=Namespace("http://surescripts-loader.apps.smartplatforms.org/")
     record=Namespace("http://smartplatforms.org/record/")
