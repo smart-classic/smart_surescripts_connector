@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}SMArt SureScripts Connector{% endblock %}
+{% block body_params %}onload="load()"{% endblock %}
 {% block content %}
 
 <h2 align="center">SMArt SureScripts Connector</h2>
@@ -13,7 +14,7 @@
 {%endif%}
 </li>
 <li>Connect to SureScripts{% if indivo_access_token and not hospital_access_token%}:
- <a href="{%url connector.views.hospital_start_auth%}">Go!</a>
+ <a href="{%url connector.views.hospital_start_auth%}" target="_new">Go!</a>
 {%else%}{% if indivo_access_token and hospital_access_token%}
 &#x2713;  <font size=-2>({{hospital_access_token}})</font>
 {%endif%}
@@ -29,5 +30,26 @@
 <a href="{%url connector.views.reset%}">Stop the Connector</a>.</p>
 {%endif%}
 
+{% if indivo_access_token and not hospital_access_token%}
+<script>
+var load = function() {
+
+window.addEventListener("message", receiveMessage, false);
+
+function receiveMessage(event)
+{
+  var thisloc = location.protocol+"//"+location.host;
+  if (event.origin !== thisloc)
+    alert("Got message from wrong origin: " + thisloc + " vs. " + event.origin);
+  
+  if (event.data === "Auth Complete") {
+     window.location.reload();
+  }
+
+}
+
+};
+</script>
+{% endif %}
 
 {% endblock %}

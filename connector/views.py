@@ -9,6 +9,7 @@ from utils import *
 from models import *
 
 from django.utils import simplejson
+from django.utils.safestring import mark_safe
 import hospital
 from smart import SmartClient
 from indivo_client_py.oauth import oauth
@@ -89,7 +90,9 @@ def hospital_start_auth(request):
     request.session['hospital_request_token'] = request_token
     
     # redirect to the place for authorization
+
     return HttpResponseRedirect(client.redirect_url(request_token))
+#    return render_template('hospital_start_auth', {'authurl': mark_safe(client.redirect_url(request_token)), 'homeurl' : mark_safe(reverse(home))})
 
 
 def hospital_after_auth(request):
@@ -118,8 +121,7 @@ def hospital_after_auth(request):
     request.session['hospital_access_token'] = access_token
 
     save_token(request.session['smart_record_id'], "google", access_token)
-    return HttpResponseRedirect(reverse(home))
-
+    return render_template('hospital_after_auth', {})
 
 def home(request):
     id = request.session.get('smart_record_id', None) # fetch ID
