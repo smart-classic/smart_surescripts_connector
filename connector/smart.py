@@ -16,16 +16,16 @@ class SmartClient(OAuthClient):
         server params includes request_token_url, access_token_url, and authorize_url
         """
        # create an oauth client
-        consumer = OAuthConsumer(consumer_key=settings.INDIVO_SERVER_OAUTH['consumer_key'], 
-                             secret      =settings.INDIVO_SERVER_OAUTH['consumer_secret'])
+        consumer = OAuthConsumer(consumer_key=settings.SMART_SERVER_OAUTH['consumer_key'], 
+                             secret      =settings.SMART_SERVER_OAUTH['consumer_secret'])
 
         super(SmartClient, self).__init__(consumer = consumer);
-
+        self.server_params = settings.SMART_SERVER_PARAMS
         if (token_dict):
             token = OAuthToken(token=token_dict['oauth_token'], secret=token_dict['oauth_token_secret'])
             self.set_token(token)
 
-        il = settings.INDIVO_SERVER_LOCATION
+        il = settings.SMART_SERVER_LOCATION
         self.baseURL = "%s://%s:%s"%(il['scheme'], il['host'], il['port'])
 
         
@@ -92,3 +92,26 @@ class SmartClient(OAuthClient):
 
     def post_med_ccr(self, data):
             return self.post("/med_store/", data, "application/xml" )
+
+
+    def update_token(self, token):
+        self.set_token(oauth.OAuthToken(token=token.token, secret = token.secret))
+    
+    def get_request_token(self, params={}):
+        print urllib.urlencode(params)
+        http_request = HTTPRequest('POST', self.server_params['request_token_url'], data = urllib.urlencode(params), data_content_type="application/x-www-form-urlencoded")
+
+        return OAuthToken.from_string(self.access_resource(http_request, oauth_parameters={'oauth_callback': self.server_params['oauth_callback']}, with_content_type=True))
+    
+    def redirect_url(self, request_token):
+        ret = "%s?oauth_token=%s" % (self.server_params['authorize_url'], request_token.token)
+        return ret
+
+    def exchange(self, request_token, verifier=None):
+        """
+        generate a random token, secret, and record_id
+        """
+        req = HTTPRequest('GET', self.server_params['access_token_url'], data = None)
+        token = OAuthToken.from_string(self.access_resource(req, oauth_parameters={'oauth_verifier' : verifier}))
+        self.set_token(token)
+        return token

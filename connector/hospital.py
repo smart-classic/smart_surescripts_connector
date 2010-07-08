@@ -57,9 +57,6 @@ class H9Client(OAuthClient):
         """
         
         access_token = self.fetch_access_token(request_token,verifier)
-        print "EXCHANGED for", access_token, dir(access_token)
-       #access_token.params['xoauth_hospital_record_id'] = access_token.params['xoauth_hospital_record_id'][0]
-
         return access_token
     
     def access_resource(self, http_request, oauth_parameters = {}, with_content_type=False):
