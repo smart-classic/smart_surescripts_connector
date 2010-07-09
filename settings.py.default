@@ -5,13 +5,22 @@
 APP_HOME = "/home/jmandel/Desktop/smart/smart_surescripts_connector"
 
 # Indivo
-INDIVO_SERVER_LOCATION = {'scheme': 'http', 'host': 'localhost', 'port': '7000'}
-INDIVO_UI_SERVER_BASE = 'http://localhost:7001'
-INDIVO_SERVER_OAUTH = {'consumer_key': 'smart-bg-app', 'consumer_secret': 'smartapp-secret'}
+SMART_SERVER_LOCATION = {'scheme': 'http', 'host': 'localhost', 'port': '7000'}
+SMART_UI_SERVER_BASE = 'http://localhost:7001'
+SMART_SERVER_OAUTH = {'consumer_key': 'smart-bg-app', 'consumer_secret': 'smartapp-secret'}
+
+SMART_SERVER_PARAMS = {
+    'request_token_url' : 'http://localhost:7000/oauth/request_token',
+    'authorize_url': 'http://localhost:7001/oauth/authorize',
+    'access_token_url': 'http://localhost:7000/oauth/access_token',
+    'oauth_callback' : 'oob'
+}
+
 
 # Hospital
 HOSPITAL_SERVER_LOCATION = {'scheme': 'https', 'host': 'www.google.com'}
 HOSPITAL_SERVER_OAUTH = {'consumer_key': 'smart.gping.org', 'consumer_secret': '91yAK31B50JhUdY5MBDLUybu'}
+
 HOSPITAL_SERVER_PARAMS = {
     'request_token_url' : 'https://www.google.com/accounts/OAuthGetRequestToken',
     'authorize_url': 'https://www.google.com/accounts/OAuthAuthorizeToken',
