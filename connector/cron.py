@@ -28,8 +28,10 @@ def sync():
         gc.set_token(gt)
          
         meds = gc.get_meds()
-        print "meds are ", meds
-        post = sc.post_med_ccr(meds)
+        print "for record", record, ", meds are ", meds
+        
+        record_id = record.split("http://smartplatforms.org/record/")[1]
+        post = sc.post_med_ccr(record_id, meds)
         print "post is ", post
 
 if __name__ == "__main__":

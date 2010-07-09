@@ -30,8 +30,9 @@ def indivo_start_auth(request):
 
     account_id = request.GET.get('account_id', None)
     record_id = request.GET.get('record_id', None)
+    request.session['smart_record_id'] = record_id
 
-    print "Started auth for account id", account_id
+    print "Started auth for account id", account_id, record_id
 
     # prepare request token parameters
 
@@ -72,9 +73,7 @@ def indivo_after_auth(request):
 
 
 #    id, label =  get_(access_token)
-    request.session['smart_access_token'] = access_token
-    
-#    save_token(request.session['smart_record_id'], "smart", access_token, label)
+    save_token(request.session['smart_record_id'], "smart", access_token)
     
 #    print "got rr", id, label
     return HttpResponseRedirect(reverse(home))
@@ -85,6 +84,10 @@ def hospital_start_auth(request):
     client = H9Client()
     print "Client SP", client.server_params
 
+    record_id = request.session.get('smart_record_id', None)
+    if (record_id == None):
+        raise Exception("Hospital auth shouldn't start with no smart_record_id defined!")
+
     # request a request token
     request_token = client.get_request_token()
     
@@ -92,10 +95,7 @@ def hospital_start_auth(request):
     request.session['hospital_request_token'] = request_token
     
     # redirect to the place for authorization
-
     return HttpResponseRedirect(client.redirect_url(request_token))
-#    return render_template('hospital_start_auth', {'authurl': mark_safe(client.redirect_url(request_token)), 'homeurl' : mark_safe(reverse(home))})
-
 
 def hospital_after_auth(request):
     # get the token and verifier from the URL parameters
@@ -120,29 +120,24 @@ def hospital_after_auth(request):
     # create the client
     parsed_token = client.exchange(token_in_session, oauth_verifier)
     access_token = {'oauth_token' : parsed_token.token, 'oauth_token_secret' : parsed_token.secret}
-    request.session['hospital_access_token'] = access_token
     
-#    save_token(request.session['smart_record_id'], "google", access_token)
+    save_token(request.session['smart_record_id'], "google", access_token)
     return render_template('hospital_after_auth', {})
 
 def home(request):
     id = request.session.get('smart_record_id', None) # fetch ID
+
+
+    smart_access_token = None
+    hospital_access_token = None
+
+ 
+    if (id):
+        tokens = get_tokens_for_record(id)
+        smart_access_token = 'smart_token' in tokens.keys() and tokens['smart_token']
+        hospital_access_token = 'google_token' in tokens.keys() and tokens['google_token']
     
-    smart_access_token = request.session.get('smart_access_token', None)
-    if smart_access_token:
-        smart_access_token = smart_access_token['oauth_token']
-    hospital_access_token = request.session.get('hospital_access_token', None)
-    if hospital_access_token:
-        hospital_access_token = hospital_access_token['oauth_token']
-
-#    smart_access_token = None
-#    hospital_access_token = None
-
-#    if (id):
-#        tokens = get_tokens_for_record(id)
-#        smart_access_token = 'smart_token' in tokens.keys() and tokens['smart_token']
-#        hospital_access_token = 'google_token' in tokens.keys() and tokens['google_token']
-        
+            
     return render_template('home', {'smart_access_token': smart_access_token, 'hospital_access_token': hospital_access_token})
 
 def connect(request):

@@ -90,8 +90,8 @@ class SmartClient(OAuthClient):
             req = HTTPRequest('POST', '%s%s'%(self.baseURL, url), data=data, data_content_type=content_type)
             return self.access_resource(req,with_content_type=True)
 
-    def post_med_ccr(self, data):
-            return self.post("/med_store/", data, "application/xml" )
+    def post_med_ccr(self, record_id, data):
+            return self.post("/med_store/records/%s/"%record_id, data, "application/xml" )
 
 
     def update_token(self, token):
