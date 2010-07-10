@@ -37,8 +37,8 @@ def indivo_start_auth(request):
     # prepare request token parameters
 
     params = {}
-    if account_id:
-        params['smart_account_email'] = account_id
+    if record_id:
+        params['record_id'] = record_id
 
     request_token = client.get_request_token(params)
     
