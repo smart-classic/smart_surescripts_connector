@@ -36,7 +36,8 @@ def indivo_start_auth(request):
 
     # prepare request token parameters
 
-    params = {}
+    params = {'offline' : 'true'}
+    
     if record_id:
         params['record_id'] = record_id
 
