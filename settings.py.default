@@ -28,6 +28,8 @@ HOSPITAL_SERVER_PARAMS = {
     'oauth_callback' : 'http://localhost:8002/google/after_auth'
 }
 
+REGENSTRIEF_SERVER_LOCATION = {'scheme': 'http', 'host': 'roi.regenstrief.org:8080'}
+
 ####
 #### Below here probably doesn't need modification
 ####
