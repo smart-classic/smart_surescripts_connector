@@ -5,7 +5,7 @@
 
 <h2 align="center">SMArt SureScripts Connector</h2>
 
-<p>  Setting up the connector is a two-step process: </p>
+<!--<p>  Setting up the connector is a two-step process: </p>-->
 
 <ol>
 <li>Connect to SMArt{% if smart_access_token %} &#x2713;<font size=-2>({{smart_access_token}})</font>{%else%}:
@@ -13,24 +13,22 @@
  <a href="{%url connector.views.indivo_start_auth%}">Go!</a>
 {%endif%}
 </li>
-<li>Connect to SureScripts{% if smart_access_token and not hospital_access_token%}:
+<!--<li>Connect to SureScripts{% if False and smart_access_token and not hospital_access_token%}:
  <a href="{%url connector.views.hospital_start_auth%}" target="_new">Go!</a>
 {%else%}{% if smart_access_token and hospital_access_token%}
 &#x2713;  <font size=-2>({{hospital_access_token}})</font>
 {%endif%}
 {%endif%}
 
-</li>
+</li>-->
 </ol>
 
-{% if smart_access_token and hospital_access_token%}
-<p>You're all connected -- your SureScripts <b>data will flow automatically</b> into SMArt.  </p>
+<p>You're all connected -- your SureScripts (proxied by RI) <b>data will flow automatically</b> into SMArt.  </p>
 
 <p>If you change your mind, you may
 <a href="{%url connector.views.reset%}">Stop the Connector</a>.</p>
-{%endif%}
 
-{% if smart_access_token and not hospital_access_token%}
+{% if False and smart_access_token and not hospital_access_token%}
 <script>
 var load = function() {
 
