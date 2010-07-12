@@ -7,15 +7,11 @@ ben.adida@childrens.harvard.edu
 from indivo_client_py.oauth.oauth import *
 from hospital import H9Client
 from smart import SmartClient
+from regenstrief import SSClient
 from indivo_client_py.oauth import oauth
 from rdflib import ConjunctiveGraph, Namespace, Literal, URIRef
 from StringIO import StringIO
 from xml.dom.minidom import parse, parseString
-
-def get_record(access_token):
-    x = SmartClient(access_token).get("/record_by_token/", None)
-    result = parseString(x)
-    return [result.firstChild.getAttribute(l) for l in ['id', 'label']]
 
 
 def get_predicate(graph, p):
@@ -42,7 +38,31 @@ def get_tokens_for_record(record_id):
     print "tokens ", ret
     return ret
 
-def get_tokens():
+def get_tokens_regenstrief():
+    q = """CONSTRUCT {
+        ?record <http://surescripts-loader.apps.smartplatforms.org/smart_token> ?smart_token.
+        ?record <http://surescripts-loader.apps.smartplatforms.org/smart_secret> ?smart_secret.
+        } WHERE {
+        ?record <http://surescripts-loader.apps.smartplatforms.org/smart_token> ?smart_token.
+        ?record <http://surescripts-loader.apps.smartplatforms.org/smart_secret> ?smart_secret.
+        }"""
+    g = ConjunctiveGraph()
+    r = SmartClient().get_rdf_store(q)
+    print r
+    g.parse(StringIO(r))
+
+    base = "http://surescripts-loader.apps.smartplatforms.org/%s"
+    targets = ['smart_token', 'smart_secret']
+    tokens = {}
+    for r in set(g.subjects()):
+        token = {}
+        for t in targets:
+            token[t] = str(g.triples((r, URIRef(base%t), None)).next()[2])
+        tokens[r] = token
+    return tokens
+
+
+def get_tokens_google():
     q = """CONSTRUCT {
         ?record <http://surescripts-loader.apps.smartplatforms.org/smart_token> ?smart_token.
         ?record <http://surescripts-loader.apps.smartplatforms.org/smart_secret> ?smart_secret.

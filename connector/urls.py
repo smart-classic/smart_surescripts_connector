@@ -13,7 +13,6 @@ urlpatterns = patterns('',
 
    # screens
    (r'^$', home),
-   (r'^connect$', connect),
    (r'^reset$', reset),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 

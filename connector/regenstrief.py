@@ -1,0 +1,29 @@
+"""
+Connect to the hospital API
+"""
+
+from utils import *
+
+import urllib, uuid
+import httplib
+
+from indivo_client_py.oauth.oauth import *
+from indivo_client_py.oauth import oauth
+from django.conf import settings
+
+class SSClient():
+    def __init__(self, token_dict=None):
+       # create an oauth client
+        il = settings.REGENSTRIEF_SERVER_LOCATION
+        self.baseURL = "%s://%s"%(il['scheme'], il['host'])
+
+    def get_dispensed_meds(self, record):
+        url = "%s/sharpAPIServer/meds/query?ln=%s&fn=%s&zipCode=%s&gender=%s"% (
+                        self.baseURL, 
+                        record['familyName'], 
+                        record['givenName'], 
+                        record['zipCode'], 
+                        (record['gender']=='male' and "M" or "F")) 
+        print "URL: ",url
+        request = urllib2.Request(url)
+        return urllib2.urlopen(request).read()

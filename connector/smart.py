@@ -9,6 +9,7 @@ import httplib
 
 from indivo_client_py.oauth.oauth import *
 from indivo_client_py.oauth import oauth
+import RDF
     
 class SmartClient(OAuthClient):
     def __init__(self, token_dict=None):
@@ -115,3 +116,37 @@ class SmartClient(OAuthClient):
         token = OAuthToken.from_string(self.access_resource(req, oauth_parameters={'oauth_verifier' : verifier}))
         self.set_token(token)
         return token
+
+    def get_record(self):
+        result = self.get("/record_by_token/", None)
+        demographics = RDF.Model()
+        parse_rdf(result, demographics)
+
+        q = RDF.SPARQLQuery("""
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+        PREFIX sp: <http://smartplatforms.org/>
+        SELECT DISTINCT ?s, ?gn, ?fn, ?zip, ?gender
+        WHERE {
+            ?s rdf:type foaf:Person.
+            ?s foaf:givenName ?gn.
+            ?s foaf:familyName ?fn.
+            ?s sp:zipcode ?zip.
+            ?s foaf:gender ?gender.
+        }""")
+        print q
+              
+        r =  q.execute(demographics)
+        r = r.next()
+        ret = {}
+        ret['givenName'] = r['gn'].literal_value['string']
+        ret['familyName'] = r['fn'].literal_value['string']
+        ret['zipCode'] = r['zip'].literal_value['string']
+        ret['gender'] = r['gender'].literal_value['string']
+        return ret
+
+def parse_rdf(string, model,context="none"):
+    parser = RDF.Parser()
+    try:
+        parser.parse_string_into_model(model, string.encode(), context)        
+    except  RDF.RedlandError: pass

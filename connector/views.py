@@ -10,7 +10,7 @@ from models import *
 
 from django.utils import simplejson
 from django.utils.safestring import mark_safe
-import hospital
+import regenstrief
 from smart import SmartClient
 from indivo_client_py.oauth import oauth
 
@@ -78,7 +78,6 @@ def indivo_after_auth(request):
     
 #    print "got rr", id, label
     return HttpResponseRedirect(reverse(home))
-
     
 def hospital_start_auth(request):
     # create the client to Indivo
@@ -141,19 +140,6 @@ def home(request):
             
     return render_template('home', {'smart_access_token': smart_access_token, 'hospital_access_token': hospital_access_token})
 
-def connect(request):
-    if request.method == "POST":
-        indivo_access_token = request.session.get('smart_access_token', None)
-        hospital_access_token = request.session.get('hospital_access_token', None)
-    
-        Connection.objects.create(indivo_token = indivo_access_token['oauth_token'],
-                                  indivo_secret = indivo_access_token['oauth_token_secret'],
-                                  indivo_record_id = indivo_access_token['xoauth_indivo_record_id'],
-                                  hospital_token = hospital_access_token.token,
-                                  hospital_secret = hospital_access_token.secret,
-                                  hospital_record_id = hospital_access_token.params['xoauth_hospital_record_id'])
-
-    return HttpResponseRedirect(reverse(home))
     
 def reset(request):
     id = request.session.get('smart_record_id', None)
