@@ -98,6 +98,10 @@ def get_medication_model(g,med_uri):
                   NS['med']['drug'],
                   NS['med']['strength'],
                   NS['med']['strengthUnits'],
+                  NS['med']['dose'],
+                  NS['med']['doseUnits'],
+                  NS['med']['startDate'],
+                  NS['med']['endDate'],
                   NS['rdf']['type']]
     
     one_med = RDF.Model()
