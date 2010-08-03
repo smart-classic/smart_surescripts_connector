@@ -12,6 +12,8 @@ from rdflib import ConjunctiveGraph, Namespace, Literal, URIRef
 from StringIO import StringIO
 from xml.dom.minidom import parse, parseString
 from token_management import *
+import time
+
 
 def sync_regenstrief():
     tokens = get_tokens_regenstrief()
@@ -20,7 +22,7 @@ def sync_regenstrief():
     regenstrief_client = SSClient()
     for record in tokens:
         t = tokens[record]
-        print "Syncing up ", record
+        print "Syncing up ", record, t['smart_token'], t['smart_secret'], time.time()
 
         smart_client.set_token(oauth.OAuthToken(token=t['smart_token'], secret = t['smart_secret']))
         r = smart_client.get_record()
@@ -28,30 +30,37 @@ def sync_regenstrief():
         dispensed_ccr = regenstrief_client.get_dispensed_meds(r)
         record_id = record.split("http://smartplatforms.org/record/")[1]
 
-        post = smart_client.post_med_ccr(record_id, dispensed_ccr)
-        print "post is ", post
+        print "GOT CCR: ", time.time()
+        put = smart_client.put_ccr_to_smart(record_id, dispensed_ccr)
+        print "put is ", put
 
 
 def sync_google():
     tokens = get_tokens_google()
     print "got tokens, ", tokens
-    sc = SmartClient()
+    smart_client = SmartClient()
     gc = H9Client()
     for record in tokens:
         t = tokens[record]
         print "Syncing up ", record, t['google_token'],  t['google_secret']
-        sc.set_token(oauth.OAuthToken(token=t['smart_token'], secret = t['smart_secret']))
+        smart_client.set_token(oauth.OAuthToken(token=t['smart_token'], secret = t['smart_secret']))
         
         gt = oauth.OAuthToken(token=t['google_token'], secret = t['google_secret'])
         print "GT", gt
         gc.set_token(gt)
          
-        meds = gc.get_meds()
-        print "for record", record, ", meds are ", meds
-        
+        h9_ccr = gc.get_meds()
+
         record_id = record.split("http://smartplatforms.org/record/")[1]
-        post = sc.post_med_ccr(record_id, meds)
-        print "post is ", post
+
+        print "GOT CCR: ", time.time()
+        put = smart_client.put_ccr_to_smart(record_id, h9_ccr)
+        print "put is ", put
+
+def sync_all():
+    sync_google()
+    sync_regenstrief()
 
 if __name__ == "__main__":
-    sync_regenstrief()
+    sync_all()
+

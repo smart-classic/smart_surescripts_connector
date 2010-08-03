@@ -2,13 +2,14 @@
 Connect to the SMArt API
 """
 
-from utils import *
-
 import urllib, uuid
 import httplib
-
+from django.conf import settings
 from indivo_client_py.oauth.oauth import *
 from indivo_client_py.oauth import oauth
+from rdf_utils import *
+import time
+
 import RDF
     
 class SmartClient(OAuthClient):
@@ -28,7 +29,7 @@ class SmartClient(OAuthClient):
 
         il = settings.SMART_SERVER_LOCATION
         self.baseURL = "%s://%s:%s"%(il['scheme'], il['host'], il['port'])
-
+        self.saved_ids = {}
         
     def access_resource(self, http_request, oauth_parameters = {}, with_content_type=False):
         """
@@ -55,7 +56,6 @@ class SmartClient(OAuthClient):
             path +=  "?"+(http_request.data or "")
         else:
             data = http_request.data or {}
-        print "GETTing the resource", http_request.method, path, data, header
         conn.request(http_request.method, path, data, header)
         r = conn.getresponse()
         data = r.read()
@@ -90,6 +90,10 @@ class SmartClient(OAuthClient):
     def post(self, url, data, content_type):
             req = HTTPRequest('POST', '%s%s'%(self.baseURL, url), data=data, data_content_type=content_type)
             return self.access_resource(req,with_content_type=True)
+        
+    def put(self, url, data, content_type):
+            req = HTTPRequest('PUT', '%s%s'%(self.baseURL, url), data=data, data_content_type=content_type)
+            return self.access_resource(req,with_content_type=True)
 
     def post_med_ccr(self, record_id, data):
             return self.post("/med_store/records/%s/"%record_id, data, "application/xml" )
@@ -99,7 +103,6 @@ class SmartClient(OAuthClient):
         self.set_token(oauth.OAuthToken(token=token.token, secret = token.secret))
     
     def get_request_token(self, params={}):
-        print urllib.urlencode(params)
         http_request = HTTPRequest('POST', self.server_params['request_token_url'], data = urllib.urlencode(params), data_content_type="application/x-www-form-urlencoded")
 
         return OAuthToken.from_string(self.access_resource(http_request, oauth_parameters={'oauth_callback': self.server_params['oauth_callback']}, with_content_type=True))
@@ -134,7 +137,6 @@ class SmartClient(OAuthClient):
             ?s sp:zipcode ?zip.
             ?s foaf:gender ?gender.
         }""")
-        print q
               
         r =  q.execute(demographics)
         r = r.next()
@@ -145,8 +147,58 @@ class SmartClient(OAuthClient):
         ret['gender'] = r['gender'].literal_value['string']
         return ret
 
-def parse_rdf(string, model,context="none"):
-    parser = RDF.Parser()
-    try:
-        parser.parse_string_into_model(model, string.encode(), context)        
-    except  RDF.RedlandError: pass
+
+    def put_ccr_to_smart(self, record_id, ccr_string):
+        rdf_string  = xslt_ccr_to_rdf(ccr_string)
+        model = parse_rdf(rdf_string)
+        
+        print "START PUTTING:  ", time.time()
+        med_uris = get_medication_uris(model)
+        for med_uri in med_uris:
+            self.put_med_helper(model, med_uri, record_id)
+            
+        
+        print "MEDS DONE: ", time.time()
+        med_count = {}
+        for med_uri in med_uris:
+            med_count[str(med_uri)] = 0
+            for fill_uri in get_fill_uris(model, med_uri):
+                med_count[str(med_uri)] += 1
+                self.put_fill_helper(model, med_uri, fill_uri, record_id)
+        print "FILLS DONE: ", time.time()
+        
+        for (k,v) in med_count.iteritems():
+            print k,v
+        
+    def put_med_helper(self, g, med_uri, record_id):
+        external_id = med_external_id(g, med_uri)
+        
+        med = get_medication_model(g, med_uri)
+        self.smart_med_put(record_id, external_id, serialize_rdf(med))    
+        
+    def put_fill_helper(self, g, med_uri, fill_uri, record_id):
+        ext_med = med_external_id(g, med_uri)
+        ext_fill = fill_external_id(g, fill_uri)
+        ext_fill = "%s_%s"%(ext_med, ext_fill)
+        
+        fill = get_fill_model(g, fill_uri)        
+        
+        self.smart_fill_put(record_id, ext_med, ext_fill, serialize_rdf(fill)) 
+
+    def smart_med_put(self, record_id, external_id, data):
+        try:
+            if (self.saved_ids[external_id]): return
+        except KeyError:           
+            self.saved_ids[external_id]  = True
+        
+        return self.put("/records/%s/medications/external_id/%s"%(record_id, external_id), data, "application/rdf+xml")
+    
+    def smart_fill_put(self, record_id, med_external_id, fill_external_id, data):
+        try:
+            if (self.saved_ids[fill_external_id]): return
+        except KeyError:           
+            self.saved_ids[fill_external_id]  = True
+        
+        return self.put("/records/%s/medications/external_id/%s/fulfillments/external_id/%s"%(record_id, med_external_id, fill_external_id), 
+                        data, "application/rdf+xml")
+        

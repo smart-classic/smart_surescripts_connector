@@ -9,6 +9,7 @@ urlpatterns = patterns('',
 
    (r'^google/start_auth', hospital_start_auth),
    (r'^google/after_auth', hospital_after_auth),
+   
    (r'^google/meds', google_health_meds),
 
    # screens

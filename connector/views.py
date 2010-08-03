@@ -19,8 +19,6 @@ from StringIO import StringIO
 from xml.dom.minidom import parse, parseString
 from token_management import *
 
-
-
 def indivo_start_auth(request):
     """
     begin the oAuth protocol with the server
@@ -146,7 +144,7 @@ def reset(request):
     delete_token(id, "smart")
     delete_token(id, "google")
     request.session.flush()
-    return HttpResponseRedirect(reverse(home))
+    return render_template('reset')
 
 def google_health_meds(request):
     client = H9Client() # needs tokens here if thsi s gonna work.  
