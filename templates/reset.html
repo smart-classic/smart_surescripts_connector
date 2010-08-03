@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}SMArt SureScripts Connector{% endblock %}
+{% block body_params %}{% if smart_access_token and not hospital_access_token%}onload="load()"{%endif%}{% endblock %}
+{% block content %}
+
+<h2 align="center">SMArt SureScripts Connector:  Disconnected</h2>
+{% endblock %}

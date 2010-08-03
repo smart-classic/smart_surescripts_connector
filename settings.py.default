@@ -29,6 +29,8 @@ HOSPITAL_SERVER_PARAMS = {
 }
 
 REGENSTRIEF_SERVER_LOCATION = {'scheme': 'http', 'host': 'roi.regenstrief.org:8080'}
+XSLT_STYLESHEET_LOC = APP_HOME + '/connector/document_processing/stylesheets/'
+
 
 ####
 #### Below here probably doesn't need modification
