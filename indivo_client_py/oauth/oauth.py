@@ -134,7 +134,6 @@ class OAuthSignatureMethod_HMAC_SHA1(OAuthSignatureMethod):
       if token and hasattr(token, secret_str):
         hmac_key += escape(token.secret)
     
-      print "hmac_key, message: ", hmac_key, message
       # hmac object
       try:
         import hashlib # 2.5
@@ -294,7 +293,6 @@ class OAuthRequest(object):
 
     # generate the SBS
     sbs = self.get_signature_base_string()
-    print "SBS: ", sbs
     # set the signature
     self.signature = signature_method.sign(sbs, self.consumer, self.token)
 

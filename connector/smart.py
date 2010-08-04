@@ -129,13 +129,14 @@ class SmartClient(OAuthClient):
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
         PREFIX sp: <http://smartplatforms.org/>
-        SELECT DISTINCT ?s, ?gn, ?fn, ?zip, ?gender
+        SELECT DISTINCT ?s, ?gn, ?fn, ?zip, ?gender, ?birthday
         WHERE {
             ?s rdf:type foaf:Person.
             ?s foaf:givenName ?gn.
             ?s foaf:familyName ?fn.
             ?s sp:zipcode ?zip.
             ?s foaf:gender ?gender.
+            ?s sp:birthday ?birthday.
         }""")
               
         r =  q.execute(demographics)
@@ -145,6 +146,7 @@ class SmartClient(OAuthClient):
         ret['familyName'] = r['fn'].literal_value['string']
         ret['zipCode'] = r['zip'].literal_value['string']
         ret['gender'] = r['gender'].literal_value['string']
+        ret['DOB'] = r['birthday'].literal_value['string']
         return ret
 
 
@@ -154,9 +156,9 @@ class SmartClient(OAuthClient):
         
         print "START PUTTING:  ", time.time()
         med_uris = get_medication_uris(model)
+
         for med_uri in med_uris:
-            self.put_med_helper(model, med_uri, record_id)
-            
+            self.put_med_helper(model, med_uri, record_id)    
         
         print "MEDS DONE: ", time.time()
         med_count = {}
@@ -167,12 +169,11 @@ class SmartClient(OAuthClient):
                 self.put_fill_helper(model, med_uri, fill_uri, record_id)
         print "FILLS DONE: ", time.time()
         
-        for (k,v) in med_count.iteritems():
-            print k,v
+        total = 0
+        print "Total fills: ", len(med_count.keys())
         
     def put_med_helper(self, g, med_uri, record_id):
         external_id = med_external_id(g, med_uri)
-        
         med = get_medication_model(g, med_uri)
         self.smart_med_put(record_id, external_id, serialize_rdf(med))    
         

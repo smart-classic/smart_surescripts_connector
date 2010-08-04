@@ -27,7 +27,8 @@ def sync_regenstrief():
         smart_client.set_token(oauth.OAuthToken(token=t['smart_token'], secret = t['smart_secret']))
         r = smart_client.get_record()
 
-        dispensed_ccr = regenstrief_client.get_dispensed_meds(r)
+        #open("/home/jmandel/Desktop/smart/smart_surescripts_connector/connector/tad.xml").read()#
+        dispensed_ccr =  regenstrief_client.get_dispensed_meds(r)
         record_id = record.split("http://smartplatforms.org/record/")[1]
 
         print "GOT CCR: ", time.time()
@@ -58,8 +59,13 @@ def sync_google():
         print "put is ", put
 
 def sync_all():
-    sync_google()
-    sync_regenstrief()
+    try:
+        sync_google()
+    except: pass
+    
+    try:
+        sync_regenstrief()
+    except: pass
 
 if __name__ == "__main__":
     sync_all()

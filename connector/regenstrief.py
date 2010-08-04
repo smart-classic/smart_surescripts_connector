@@ -18,12 +18,13 @@ class SSClient():
         self.baseURL = "%s://%s"%(il['scheme'], il['host'])
 
     def get_dispensed_meds(self, record):
-        url = "%s/sharpAPIServer/meds/query?ln=%s&fn=%s&zipCode=%s&gender=%s"% (
+        url = "%s/sharpAPIServer/meds/query?ln=%s&fn=%s&zipCode=%s&gender=%s&DOB=%s"% (
                         self.baseURL, 
                         record['familyName'], 
                         record['givenName'], 
                         record['zipCode'], 
-                        (record['gender']=='male' and "M" or "F")) 
+                        (record['gender']=='male' and "M" or "F"),
+                        record['DOB']) 
         print "URL: ",url
         request = urllib2.Request(url)
         return urllib2.urlopen(request).read()
