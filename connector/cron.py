@@ -26,6 +26,7 @@ def sync_regenstrief():
 
         smart_client.set_token(oauth.OAuthToken(token=t['smart_token'], secret = t['smart_secret']))
         r = smart_client.get_record()
+        if (r == None): continue
 
         #open("/home/jmandel/Desktop/smart/smart_surescripts_connector/connector/tad.xml").read()#
         dispensed_ccr =  regenstrief_client.get_dispensed_meds(r)

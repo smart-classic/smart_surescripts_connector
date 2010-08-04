@@ -139,15 +139,18 @@ class SmartClient(OAuthClient):
             ?s sp:birthday ?birthday.
         }""")
               
-        r =  q.execute(demographics)
-        r = r.next()
-        ret = {}
-        ret['givenName'] = r['gn'].literal_value['string']
-        ret['familyName'] = r['fn'].literal_value['string']
-        ret['zipCode'] = r['zip'].literal_value['string']
-        ret['gender'] = r['gender'].literal_value['string']
-        ret['DOB'] = r['birthday'].literal_value['string']
-        return ret
+        try:
+            r =  q.execute(demographics)
+            r = r.next()
+            ret = {}
+            ret['givenName'] = r['gn'].literal_value['string']
+            ret['familyName'] = r['fn'].literal_value['string']
+            ret['zipCode'] = r['zip'].literal_value['string']
+            ret['gender'] = r['gender'].literal_value['string']
+            ret['DOB'] = r['birthday'].literal_value['string']
+            return ret
+        except:
+            return None
 
 
     def put_ccr_to_smart(self, record_id, ccr_string):
