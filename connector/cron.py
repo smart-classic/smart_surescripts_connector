@@ -18,9 +18,10 @@ import time
 def sync_regenstrief():
     tokens = get_tokens_regenstrief()
     print "got tokens, ", tokens
-    smart_client = SmartClient()
     regenstrief_client = SSClient()
     for record in tokens:
+        smart_client = SmartClient() # create a new one with each loop because it saves state!
+
         t = tokens[record]
         print "Syncing up ", record, t['smart_token'], t['smart_secret'], time.time()
 
