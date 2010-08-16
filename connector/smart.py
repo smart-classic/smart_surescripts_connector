@@ -30,6 +30,7 @@ class SmartClient(OAuthClient):
         il = settings.SMART_SERVER_LOCATION
         self.baseURL = "%s://%s:%s"%(il['scheme'], il['host'], il['port'])
         self.saved_ids = {}
+        self.app_id = settings.SMART_APP_ID
         
     def access_resource(self, http_request, oauth_parameters = {}, with_content_type=False):
         """
@@ -62,29 +63,34 @@ class SmartClient(OAuthClient):
         conn.close()
         return data
     
+    @property
+    def storage_endpoint(self):
+        return "/app_storage/%s/"%self.app_id
     
-    def put_rdf_store(self, graph):
-        req = HTTPRequest('PUT', '%s/rdf_store/'%self.baseURL, data=graph.serialize(), data_content_type="application/rdf+xml")
-        return self.access_resource(req,with_content_type=True)
+    def post_rdf_store(self, graph):
+        return self.post(self.storage_endpoint, graph.serialize(), "application/rdf+xml")
     
     def delete_rdf_store(self, sparql):
-        req = HTTPRequest('DELETE', '%s/rdf_store/'%self.baseURL, data=urllib.urlencode({'SPARQL' : sparql}), data_content_type="application/x-www-form-urlencoded")
-        return self.access_resource(req,with_content_type=True)
+        print "Endpoint: ", self.storage_endpoint
+        return self.delete(self.storage_endpoint, urllib.urlencode({'SPARQL' : sparql}), "application/x-www-form-urlencoded")
         
     def get_rdf_store(self, sparql=None):
+        data = None
+        ct = "application/x-www-form-urlencoded"
+        
         if sparql:
-            req = HTTPRequest('GET', '%s/rdf_store/'%self.baseURL, 
-                              data=urllib.urlencode({ "SPARQL": sparql }),
-                              data_content_type="application/x-www-form-urlencoded")
-            
-            return self.access_resource(req, with_content_type=True)
-
-        else:
-            req = HTTPRequest('GET', '%s/rdf_store/'%self.baseURL, data=None)
-            return self.access_resource(req)
-
-    def get(self, url, data):
-            req = HTTPRequest('GET', '%s%s'%(self.baseURL, url), data=data)
+            data = urllib.urlencode({ "SPARQL": sparql })
+        
+        
+        return self.get(self.storage_endpoint, data, ct)
+        
+    def get(self, url, data, content_type=None):
+            req = None
+            if (content_type):
+                req = HTTPRequest('GET', '%s%s'%(self.baseURL, url), data=data)
+            else:
+                req = HTTPRequest('GET', '%s%s'%(self.baseURL, url), data=data)
+                
             return self.access_resource(req)
 
     def post(self, url, data, content_type):
@@ -95,6 +101,10 @@ class SmartClient(OAuthClient):
             req = HTTPRequest('PUT', '%s%s'%(self.baseURL, url), data=data, data_content_type=content_type)
             return self.access_resource(req,with_content_type=True)
 
+    def delete(self, url, data, content_type):
+            req = HTTPRequest('DELETE', '%s%s'%(self.baseURL, url), data=data, data_content_type=content_type)
+            return self.access_resource(req,with_content_type=True)
+        
     def post_med_ccr(self, record_id, data):
             return self.post("/med_store/records/%s/"%record_id, data, "application/xml" )
 

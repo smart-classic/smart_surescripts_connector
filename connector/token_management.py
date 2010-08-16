@@ -116,5 +116,5 @@ def save_token(id, service, access_token, label=None):
     graph.add((record[id], ss['%s_token'%service], Literal(access_token['oauth_token'])))
     graph.add((record[id], ss['%s_secret'%service], Literal(access_token['oauth_token_secret'])))
 
-    SmartClient().put_rdf_store(graph)
+    SmartClient().post_rdf_store(graph)
     
