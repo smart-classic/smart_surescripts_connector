@@ -16,7 +16,7 @@ SMART_SERVER_PARAMS = {
     'oauth_callback' : 'oob'
 }
 
-
+SMART_APP_ID = 'surescripts-sync@apps.smart.org'
 # Hospital
 HOSPITAL_SERVER_LOCATION = {'scheme': 'https', 'host': 'www.google.com'}
 HOSPITAL_SERVER_OAUTH = {'consumer_key': 'smart.gping.org', 'consumer_secret': '91yAK31B50JhUdY5MBDLUybu'}
