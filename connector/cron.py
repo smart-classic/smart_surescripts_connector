@@ -47,7 +47,11 @@ def sync_google():
 
     gc = H9Client()
     for record in tokens:
-        gt = tokens[record]['google']
+        try:
+            gt = tokens[record]['google']
+        except: 
+            continue
+
         st = tokens[record]['smart']
 
         smart_client = get_smart_client()
