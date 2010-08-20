@@ -30,8 +30,8 @@ def sync_regenstrief():
         r = smart_client.get_record()
         if (r == None): continue
 
-        dispensed_ccr =   open("/home/jmandel/Desktop/smart/smart_surescripts_connector/connector/tad.xml").read()#
-#        dispensed_ccr =  regenstrief_client.get_dispensed_meds(r)
+#        dispensed_ccr =   open("/home/jmandel/Desktop/smart/smart_surescripts_connector/connector/tad.xml").read()#
+        dispensed_ccr =  regenstrief_client.get_dispensed_meds(r)
         print "rid: ", record
         record_id = record.split("http://smartplatforms.org/records/")[1]
 
