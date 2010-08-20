@@ -4,83 +4,13 @@ Josh Mandel
 joshua.mandel@childrens.harvard.edu
 """
 
-from django.conf import settings
 from xml.dom.minidom import parse, parseString
 import urllib
 import libxml2, libxslt
-from StringIO import StringIO
 import RDF
 import datetime
 import time
-
-
-NS = {}
-NS['dc'] = RDF.NS('http://purl.org/dc/elements/1.1/')
-NS['dcterms'] = RDF.NS('http://purl.org/dc/terms/')
-NS['med'] = RDF.NS('http://smartplatforms.org/medication#')
-NS['umls'] = RDF.NS('http://www.nlm.nih.gov/research/umls/')
-NS['sp'] = RDF.NS('http://smartplatforms.org/')
-NS['foaf']=RDF.NS('http://xmlns.com/foaf/0.1/')
-NS['rdf'] = RDF.NS('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-NS['rxn'] = RDF.NS('http://link.informatics.stonybrook.edu/rxnorm/')
-NS['rxcui'] = RDF.NS('http://link.informatics.stonybrook.edu/rxnorm/RXCUI/')
-NS['rxaui'] = RDF.NS('http://link.informatics.stonybrook.edu/rxnorm/RXAUI/')
-NS['rxatn'] = RDF.NS('http://link.informatics.stonybrook.edu/rxnorm/RXATN#')
-NS['rxrel'] = RDF.NS('http://link.informatics.stonybrook.edu/rxnorm/REL#')
-NS['ccr'] = RDF.NS('urn:astm-org:CCR')
-
-
-def serialize_rdf(model):
-    serializer = bound_serializer()
-    
-    try: return serializer.serialize_model_to_string(model)
-    
-    except AttributeError:
-      try:
-          tmpmodel = RDF.Model()
-          tmpmodel.add_statements(model.as_stream())
-          return serializer.serialize_model_to_string(tmpmodel)
-      except AttributeError:
-          return '<?xml version="1.0" encoding="UTF-8"?>'
-
-def bound_serializer():
-    s = RDF.RDFXMLSerializer()
-    bind_ns(s)
-    return s 
-
-def bind_ns(serializer, ns=NS):
-    for k in ns.keys():
-        v = ns[k]
-        serializer.set_namespace(k, RDF.Uri(v._prefix))
-
-def parse_rdf(string, model=None, context="none"):
-    if model == None:
-        model = RDF.Model() 
-    parser = RDF.Parser()
-    try:
-        parser.parse_string_into_model(model, string.encode(), context)
-    except  RDF.RedlandError: pass
-    return model
-
-
-
-def xslt_ccr_to_rdf(source, stylesheet="ccr_to_med_rdf"):
-    sourceDOM = libxml2.parseDoc(source)
-    ss = "%s%s"%(settings.XSLT_STYLESHEET_LOC, "%s.xslt"%stylesheet)
-    ssDOM = libxml2.parseFile(ss)
-    return apply_xslt(sourceDOM, ssDOM)
-
-def apply_xslt(sourceDOM, stylesheetDOM):
-    style = libxslt.parseStylesheetDoc(stylesheetDOM)
-    return style.applyStylesheet(sourceDOM, None).serialize()
-
-def get_property(g, s, p):
-    qs = RDF.Statement(subject=s, 
-                       predicate=p, 
-                       object=None)
-    
-
-    return g.find_statements(qs)
+from smart_client.rdf_utils import *
 
 def get_medication_uris(g):
     qs = RDF.Statement(subject=None, 

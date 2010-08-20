@@ -7,8 +7,7 @@ from utils import *
 import urllib, uuid
 import httplib
 
-from indivo_client_py.oauth.oauth import *
-from indivo_client_py.oauth import oauth
+from smart_client.oauth import *
 from django.conf import settings
 
 class H9Client(OAuthClient):

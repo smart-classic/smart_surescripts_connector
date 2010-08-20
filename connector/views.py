@@ -1,30 +1,28 @@
 """ 
-Views for the Indivo Problems app
+Views for the SMArt Connector App
 
 Ben Adida
 ben.adida@childrens.harvard.edu
+
+Josh Mandel
+joshua.mandel@childrens.harvard.edu
 """
-from indivo_client_py.oauth.oauth import *
+from smart_client.oauth import *
 from utils import *
 from models import *
-
+from connector.hospital import H9Client
 from django.utils import simplejson
 from django.utils.safestring import mark_safe
 import regenstrief
-from smart import SmartClient
-from indivo_client_py.oauth import oauth
-
-from rdflib import ConjunctiveGraph, Namespace, Literal
-from StringIO import StringIO
+from smart_client.smart import SmartClient
 from xml.dom.minidom import parse, parseString
-from token_management import *
 
 def indivo_start_auth(request):
     """
     begin the oAuth protocol with the server
     """
 
-    client = SmartClient() 
+    client = get_smart_client() 
 
     account_id = request.GET.get('account_id', None)
     record_id = request.GET.get('record_id', None)
@@ -62,19 +60,12 @@ def indivo_after_auth(request):
         return HttpResponse("oh oh bad token")
 
     # get the indivo client and use the request token as the token for the exchange
-    client = SmartClient()
+    client = get_smart_client()
     client.update_token(token_in_session)
 
     parsed_token = client.exchange(token_in_session, oauth_verifier)
-
-#    parsed_token = client.exchange(token_in_session, oauth_verifier)
-    access_token = {'oauth_token' : parsed_token.token, 'oauth_token_secret' : parsed_token.secret}
-
-
-#    id, label =  get_(access_token)
-    save_token(request.session['smart_record_id'], "smart", access_token)
+    get_smart_client().save_token(request.session['smart_record_id'],  parsed_token, "smart")
     
-#    print "got rr", id, label
     return HttpResponseRedirect(reverse(home))
     
 def hospital_start_auth(request):
@@ -117,23 +108,25 @@ def hospital_after_auth(request):
 
     # create the client
     parsed_token = client.exchange(token_in_session, oauth_verifier)
-    access_token = {'oauth_token' : parsed_token.token, 'oauth_token_secret' : parsed_token.secret}
-    
-    save_token(request.session['smart_record_id'], "google", access_token)
+    get_smart_client().save_token(request.session['smart_record_id'], parsed_token, "google")
     return render_template('hospital_after_auth', {})
 
 def home(request):
     id = request.session.get('smart_record_id', None) # fetch ID
-
+    sc = get_smart_client()
 
     smart_access_token = None
     hospital_access_token = None
 
  
     if (id):
-        tokens = get_tokens_for_record(id)
-        smart_access_token = 'smart_token' in tokens.keys() and tokens['smart_token']
-        hospital_access_token = 'google_token' in tokens.keys() and tokens['google_token']
+        tokens = {}
+
+        tokens['smart_token'] = sc.get_tokens_for_record(id, "smart")
+        tokens['google_token'] = sc.get_tokens_for_record(id, "google")
+            
+        smart_access_token = 'smart_token' in tokens.keys() and tokens['smart_token'] and tokens['smart_token'].token
+        hospital_access_token = 'google_token' in tokens.keys() and tokens['google_token'] and tokens['google_token'].token
     
             
     return render_template('home', {'smart_access_token': smart_access_token, 'hospital_access_token': hospital_access_token})
@@ -141,8 +134,9 @@ def home(request):
     
 def reset(request):
     id = request.session.get('smart_record_id', None)
-    delete_token(id, "smart")
-    delete_token(id, "google")
+    client = get_smart_client()
+    client.delete_token(id, "smart")
+    client.delete_token(id, "google")
     request.session.flush()
     return render_template('reset')
 

@@ -1,3 +1,0 @@
-[submodule "oauth"]
-  path = oauth
-  url = git@git.chip.org:oauth_py

@@ -8,7 +8,6 @@ ben.adida@childrens.harvard.edu
 from xml.etree import ElementTree
 import cgi
 
-from indivo_client_py.lib.client import IndivoClient
 
 # settings including where to find Indivo
 from django.conf import settings
@@ -18,13 +17,8 @@ from django.core.exceptions import *
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.template import Context, loader
-
-
-def get_indivo_client(request, with_session_token=True):
-    client = IndivoClient(settings.INDIVO_SERVER_OAUTH['consumer_key'], settings.INDIVO_SERVER_OAUTH['consumer_secret'], settings.INDIVO_SERVER_LOCATION)
-    if with_session_token:
-        client.update_token(request.session['access_token'])
-    return client
+from django.conf import settings
+from smart_client.smart import SmartClient
 
 def parse_token_from_response(resp):
     token = cgi.parse_qs(resp.response['response_data'])
@@ -69,3 +63,10 @@ def parse_problem(etree):
                    'comments': etree.findtext('%scomments' % NS),
                    'diagnosed_by': etree.findtext('%sdiagnosedBy' % NS)}
     return new_problem
+
+def get_smart_client(resource_tokens=None):
+    ret = SmartClient(settings.SMART_APP_ID, settings.SMART_SERVER_PARAMS, settings.SMART_SERVER_OAUTH, resource_tokens)
+    ret.stylesheet = "%s%s"%(settings.XSLT_STYLESHEET_LOC, "ccr_to_med_rdf.xslt")
+    return ret
+
+
