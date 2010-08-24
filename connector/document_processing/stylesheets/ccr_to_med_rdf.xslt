@@ -134,9 +134,9 @@ version="1.0">
   </xsl:when></xsl:choose>
 
 <xsl:choose><xsl:when test="$instructions">
-<med:notes>
+<med:instructions>
 <xsl:value-of select="$instructions"/>
-</med:notes>
+</med:instructions>
 </xsl:when>
 </xsl:choose>
 
