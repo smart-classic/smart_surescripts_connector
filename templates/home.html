@@ -24,6 +24,17 @@
 {%endif%}
 
 </li>
+
+<li>Connect to Microsoft HealthVault {% if smart_access_token and not hv_access_token%}:
+ <a href="{%url connector.healthvault.healthvault_start_auth%}" target="_new">Go!</a>
+{%else%}{% if smart_access_token and hv_access_token%}
+&#x2713;  <font size=-2>({{hv_access_token}})</font>
+{%endif%}
+{%endif%}
+
+</li>
+
+
 </ol>
 
 

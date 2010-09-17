@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}SMArt SureScripts Connector{% endblock %}
+{% block body_params %}onload="load()"{% endblock %}
+{% block content %}
+<h2 align="center">SMArt SureScripts Connector</h2>
+
+<p>  Done authenticating:  Here are your meds:</p>
+<h2>{{meds}}</h2>
+
+<script>
+
+//var load = function() {
+//   window.opener.postMessage("Auth Complete", "*");
+//   window.close();
+
+//};
+</script>
+
+{% endblock %}

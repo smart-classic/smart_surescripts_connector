@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
 
 from views import *
+from healthvault import healthvault_start_auth, healthvault_after_auth
 
 urlpatterns = patterns('',
    # authentication
@@ -9,8 +10,11 @@ urlpatterns = patterns('',
 
    (r'^google/start_auth', hospital_start_auth),
    (r'^google/after_auth', hospital_after_auth),
-   
    (r'^google/meds', google_health_meds),
+
+
+   (r'^healthvault/start_auth', healthvault_start_auth),
+   (r'^healthvault/after_auth', healthvault_after_auth),
 
    # screens
    (r'^$', home),

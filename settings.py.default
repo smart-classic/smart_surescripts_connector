@@ -2,7 +2,7 @@
 
 ## PARAMETERS TO REVIEW
 
-APP_HOME = "/home/jmandel/Desktop/smart/smart_surescripts_connector"
+APP_HOME = "/home/jmandel/smart/smart_surescripts_connector"
 
 # Indivo
 SMART_SERVER_LOCATION = {'scheme': 'http', 'host': 'localhost', 'port': '7000'}
@@ -31,6 +31,7 @@ HOSPITAL_SERVER_PARAMS = {
 
 REGENSTRIEF_SERVER_LOCATION = {'scheme': 'http', 'host': 'roi.regenstrief.org:8080'}
 XSLT_STYLESHEET_LOC = APP_HOME + '/connector/document_processing/stylesheets/'
+CRYPTO_LOC = APP_HOME + '/connector/document_processing/crypto/'
 
 
 ####
