@@ -1,0 +1,17 @@
+{
+  "name" : "SMArt Connector",
+  "description" : "Keeps SMArt updated from a SureScripts feed (long-term, runs in background)",
+  "author" : "Josh Mandel, Children's Hospital Boston",
+  "id" : "smart-connector@apps.smartplatforms.org",
+  "version" : ".1a",
+
+  "base_url" : "http://localhost:8002",
+  "activities" : {
+    "main" :              "$base_url/smart/start_auth?record_id={record_id}",
+    "after_auth" :        "$base_url/smart/start_auth?record_id={record_id}"
+  },
+	
+  "web_hooks" : { },
+
+  "icon" :  "$base_url/icon.png"
+}

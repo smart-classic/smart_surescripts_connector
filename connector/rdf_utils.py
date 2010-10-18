@@ -27,9 +27,9 @@ def get_medication_model(g,med_uri):
     properties = [NS['dcterms']['title'], 
                   NS['med']['drug'],
                   NS['med']['strength'],
-                  NS['med']['strengthUnits'],
+                  NS['med']['strengthUnit'],
                   NS['med']['dose'],
-                  NS['med']['doseUnits'],
+                  NS['med']['doseUnit'],
                   NS['med']['startDate'],
                   NS['med']['endDate'],
                   NS['rdf']['type']]
