@@ -6,11 +6,10 @@
   "version" : ".1a",
 
   "base_url" : "http://localhost:8002",
-  "activities" : {
-    "main" :              "$base_url/smart/start_auth?record_id={record_id}",
-    "after_auth" :        "$base_url/smart/start_auth?record_id={record_id}"
-  },
-	
+
+  "mode" : "background",
+
+  "activities" : { },
   "web_hooks" : { },
 
   "icon" :  "$base_url/icon.png"

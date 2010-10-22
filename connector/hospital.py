@@ -2,7 +2,7 @@
 Connect to the hospital API
 """
 
-from utils import *
+#from utils import *
 
 import urllib, uuid
 import httplib

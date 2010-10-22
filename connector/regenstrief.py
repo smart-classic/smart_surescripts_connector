@@ -2,7 +2,7 @@
 Connect to the hospital API
 """
 
-from utils import *
+#from utils import *
 
 import urllib, uuid
 import httplib
@@ -21,9 +21,9 @@ class SSClient():
                         self.baseURL, 
                         record['familyName'], 
                         record['givenName'], 
-                        record['zipCode'], 
+                        record['zipcode'], 
                         (record['gender']=='male' and "M" or "F"),
-                        record['DOB']) 
-        print "URL: ",url
+                        record['birthday'][0:4]+record['birthday'][5:7]+record['birthday'][8:10]) 
+        print "requesting RI url", url
         request = urllib2.Request(url)
         return urllib2.urlopen(request).read()

@@ -10,35 +10,24 @@ from hospital import H9Client
 from regenstrief import SSClient
 from smart_client.smart import SmartClient
 from xml.dom.minidom import parse, parseString
-import time
-
+import sys, time
+from smart_client.rdf_utils import *
 
 def sync_regenstrief():
-    
-    tokens = get_smart_client().get_all_tokens(["smart"])
-    print "got tokens, ", tokens
-
     regenstrief_client = SSClient()
     smart_client = get_smart_client()
 
-    for record in tokens:
-        st = tokens[record]['smart']
-        print "Syncing up ", record, st.token, st.secret, time.time()
-
-        smart_client.set_token(st)
-
-        r = smart_client.get_record()
-        if (r == None): continue
-
-#        dispensed_ccr =   open("/home/jmandel/Desktop/smart/smart_surescripts_connector/connector/tad.xml").read()#
-        dispensed_ccr =  regenstrief_client.get_dispensed_meds(r)
-        print "rid: ", record
-        record_id = record.split("http://smartplatforms.org/records/")[1]
-
-        print "GOT CCR: ", time.time()
+    for record_id in smart_client.loop_over_records():
+        if (record_id[0] != "2"): 
+            print "not a SS patient"
+            continue
+        print "Getting CCR ", record_id, time.time()
+        d = smart_client.get_demographics()
+        dispensed_ccr =  regenstrief_client.get_dispensed_meds(d)
+        print "Got CCR: ", time.time()
+        
         put = smart_client.put_ccr_to_smart(record_id, dispensed_ccr)
         print "put is ", put
-
 
 def sync_google():
     print "Getting tokens"
@@ -78,5 +67,5 @@ def sync_all():
     except: pass
 
 if __name__ == "__main__":
-    sync_all()
-
+    sync_regenstrief()
+  
